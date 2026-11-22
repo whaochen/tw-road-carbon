@@ -42,13 +42,13 @@
               <span class="stat-label">批次上限</span>
               <strong class="stat-val">20 筆／次</strong>
             </div>
-            <div class="stat-chip">
-              <span class="stat-label">本機引擎狀態</span>
+            <button type="button" id="btn-engine-status" class="stat-chip stat-chip-btn" title="點擊重新偵測本機引擎或查看連線引導">
+              <span class="stat-label">本機引擎狀態 <span id="kpi-engine-hint" class="stat-action-hint">↻ 點擊重連</span></span>
               <strong class="stat-val" id="kpi-engine-status">
                 <span class="engine-dot" id="kpi-engine-dot" aria-hidden="true"></span>
                 <span id="kpi-engine-text">偵測中</span>
               </strong>
-            </div>
+            </button>
           </div>
           <div class="topbar-badge">
             <hao-element-badge symbol="Cr" theme="dark"></hao-element-badge>
@@ -352,6 +352,39 @@
       臺灣陸地運輸GHG排放計算器（<code>tw-road-carbon</code>）｜晧脈元素庫 <code>Cr · 24</code>｜環境部 <code>CFP_P_02</code> 公路運輸係數 × Playwright MRV 查證引擎
     </div>
   </footer>
+
+  <!-- 本機引擎連線與瀏覽器權限引導視窗 -->
+  <div id="engine-help-modal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="engine-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="engine-modal-title">本機引擎連線與瀏覽器權限引導</h2>
+        <button type="button" id="btn-close-engine-modal" class="modal-close" aria-label="關閉">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="engine-modal-desc" style="margin-top: 0; font-size: 0.9rem; color: var(--text-muted);">
+          若您已啟動本機引擎（<code>127.0.0.1:8787</code>），但網頁仍顯示「未啟動」或「權限遭封鎖」，請依下列方式排除：
+        </p>
+        <div class="notice notice-warn">
+          <strong>方法 1：重新允許瀏覽器「本地網路存取」權限（推薦）</strong>
+          <ol style="margin: 6px 0 0; padding-left: 18px;">
+            <li>點擊瀏覽器網址列最左側的 <strong>設定圖示（鎖頭或調整符號）</strong>。</li>
+            <li>找到「<strong>本地網路存取（Local network access）</strong>」或「不安全的內容」。</li>
+            <li>將權限切換為「<strong>允許</strong>」，再點擊下方「立即重新偵測」。</li>
+          </ol>
+        </div>
+        <div class="notice notice-info" style="margin-bottom: 0;">
+          <strong>方法 2：免設定直接開啟本機版（零權限限制）</strong>
+          <p style="margin: 6px 0 0;">
+            本機引擎已內建完整網頁前端，若不想調整權限，可直接從本機網址開啟使用，功能與線上版完全相同。
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-modal-retry" class="btn btn-primary">立即重新偵測</button>
+        <a href="http://127.0.0.1:8787/" target="_blank" rel="noopener" class="btn btn-outline">直接開啟本機版 (127.0.0.1:8787) ↗</a>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="js/app.js"></script>
 </body>
