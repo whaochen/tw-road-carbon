@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臺灣陸地運輸GHG排放計算器 ｜ 晧脈元素庫</title>
+  <meta name="description" content="串接環境部公路運輸 9 大類碳足跡係數與本機 Google Maps 最短距離原生截圖引擎，支援單筆試算與 20 筆批次 ZIP 查證匯出。">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+  <script src="https://hao-element-matrix.pages.dev/badge.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="banner-left">
+        <!-- 第 1 層：Cr 元素方塊 + 主標題與單行精簡副標 -->
+        <div class="brand-area">
+          <div class="element-tile" aria-hidden="true">
+            <span class="el-num">24</span>
+            <span class="el-sym">Cr</span>
+            <span class="el-name">Chromium</span>
+          </div>
+          <div class="brand-text">
+            <h1>臺灣陸地運輸GHG排放計算器</h1>
+            <p>晧脈元素庫・Taiwan Road Carbon｜環境部公路運輸係數 × 最短距離原生截圖 MRV</p>
+          </div>
+        </div>
+
+        <!-- 第 2 層：4 張毛玻璃 KPI 數據卡 + 右側唯一中央共用元素徽章 -->
+        <div class="banner-row2">
+          <div class="banner-stats" aria-label="系統狀態與資料摘要">
+            <div class="stat-chip">
+              <span class="stat-label">公路係數筆數</span>
+              <strong class="stat-val" id="kpi-factor-count">載入中...</strong>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-label">支援導航模式</span>
+              <strong class="stat-val">汽車／機車</strong>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-label">批次上限</span>
+              <strong class="stat-val">20 筆／次</strong>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-label">本機引擎狀態</span>
+              <strong class="stat-val" id="kpi-engine-status">
+                <span class="engine-dot" id="kpi-engine-dot" aria-hidden="true"></span>
+                <span id="kpi-engine-text">偵測中</span>
+              </strong>
+            </div>
+          </div>
+          <div class="topbar-badge">
+            <hao-element-badge symbol="Cr" theme="dark"></hao-element-badge>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側動畫區（260px–320px）：ROAD · MRV SHORTEST PATH -->
+      <aside class="banner-live-card" aria-label="ROAD MRV 最短路徑動畫示意">
+        <div class="live-card-header">
+          <span class="live-pill">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span class="live-title">ROAD · MRV SHORTEST PATH</span>
+          </span>
+        </div>
+        <svg class="live-road-svg" viewBox="0 0 300 96" width="300" height="96" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="多條候選道路網中，最短路徑亮起電光藍霓虹流光並行駛光點">
+          <defs>
+            <linearGradient id="crShortestBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0284c7" stop-opacity="0.45"/>
+              <stop offset="50%" stop-color="#29b6f6" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0.85"/>
+            </linearGradient>
+            <!-- 候選較遠路線 A（上方繞道） -->
+            <path id="altRoadTop" d="M 24 64 C 72 16, 152 14, 212 24 C 245 30, 262 34, 276 32"/>
+            <!-- 候選較遠路線 B（下方繞道） -->
+            <path id="altRoadBottom" d="M 24 64 C 84 86, 174 84, 226 66 C 254 56, 266 44, 276 32"/>
+            <!-- 最短路徑（電光藍主路線） -->
+            <path id="shortestRoadPath" d="M 24 64 C 86 52, 134 48, 176 42 C 216 37, 246 34, 276 32"/>
+          </defs>
+
+          <!-- 背景微網格 -->
+          <g stroke="rgba(148, 163, 184, 0.12)" stroke-width="1">
+            <line x1="0" y1="24" x2="300" y2="24"/>
+            <line x1="0" y1="52" x2="300" y2="52"/>
+            <line x1="0" y1="80" x2="300" y2="80"/>
+            <line x1="75" y1="0" x2="75" y2="96"/>
+            <line x1="150" y1="0" x2="150" y2="96"/>
+            <line x1="225" y1="0" x2="225" y2="96"/>
+          </g>
+
+          <!-- 候選替代道路（灰藍虛線） -->
+          <use href="#altRoadTop" fill="none" stroke="rgba(148, 163, 184, 0.34)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <use href="#altRoadBottom" fill="none" stroke="rgba(148, 163, 184, 0.3)" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- 最短路徑電光藍霓虹流光 -->
+          <use href="#shortestRoadPath" class="shortest-glow" fill="none" stroke="url(#crShortestBeam)" stroke-width="3.2" stroke-linecap="round"/>
+
+          <!-- 行駛中的車輛光點 -->
+          <g class="anim-vehicle">
+            <circle r="5.5" fill="rgba(41, 182, 246, 0.32)">
+              <animateMotion dur="3.4s" repeatCount="indefinite">
+                <mpath href="#shortestRoadPath"/>
+              </animateMotion>
+            </circle>
+            <circle r="2.8" fill="#ffffff">
+              <animateMotion dur="3.4s" repeatCount="indefinite">
+                <mpath href="#shortestRoadPath"/>
+              </animateMotion>
+            </circle>
+          </g>
+
+          <!-- 起訖端點與標籤 -->
+          <g>
+            <circle cx="24" cy="64" r="6" fill="rgba(41, 182, 246, 0.25)"/>
+            <circle cx="24" cy="64" r="3" fill="#29b6f6"/>
+            <text x="24" y="82" text-anchor="middle" fill="#cbd5e1" font-size="9.5" font-weight="700" font-family="ui-monospace, monospace">ORIG</text>
+
+            <rect x="128" y="25" width="44" height="14" rx="7" fill="rgba(41, 182, 246, 0.2)" stroke="rgba(41, 182, 246, 0.6)" stroke-width="0.8"/>
+            <text x="150" y="35" text-anchor="middle" fill="#e0f2fe" font-size="8.5" font-weight="700" font-family="ui-monospace, monospace">MIN km</text>
+
+            <circle cx="276" cy="32" r="6" fill="rgba(34, 197, 94, 0.25)"/>
+            <circle cx="276" cy="32" r="3" fill="#4ade80"/>
+            <text x="276" y="19" text-anchor="middle" fill="#cbd5e1" font-size="9.5" font-weight="700" font-family="ui-monospace, monospace">DEST</text>
+          </g>
+        </svg>
+      </aside>
+    </div>
+  </header>
+
+  <!-- 純白 4 頁籤列 -->
+  <nav class="tabs-bar" aria-label="主要功能分頁">
+    <div class="container tabs-inner" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="single">單筆陸運試算</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="batch">批次最短距離與截圖（≤20 筆）</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="factors">公路運輸係數庫</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="mrv">本機引擎與 MRV 說明</button>
+    </div>
+  </nav>
+
+  <main class="container main-content">
+    <!-- 頁籤 1：單筆陸運試算 -->
+    <section id="tab-single" class="tab-panel active" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>1. 路線與公路運輸係數設定</h2>
+          <span class="sub-hint">選定係數後自動帶入汽車／機車模式，亦可手動覆蓋</span>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="single-origin">起點地址</label>
+            <input id="single-origin" type="text" placeholder="例：台積電F20P1 H2 308新竹縣寶山鄉大崎村科環路1號">
+          </div>
+          <div class="field">
+            <label for="single-destination">終點地址</label>
+            <input id="single-destination" type="text" placeholder="例：正美化工股份有限公司 300新竹市香山區">
+          </div>
+          <div class="field">
+            <label for="single-group">公路運輸類別（9 大子類）</label>
+            <select id="single-group">
+              <option value="">全部類別</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="single-factor">環境部碳足跡係數</label>
+            <select id="single-factor">
+              <option value="">載入中...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="single-vehicle">Google Maps 導航車輛模式</label>
+            <select id="single-vehicle">
+              <option value="汽車">汽車（Driving）</option>
+              <option value="機車">機車（Two-wheeler）</option>
+            </select>
+          </div>
+          <div class="field">
+            <label id="single-activity-label" for="single-activity">載重（公噸）</label>
+            <input id="single-activity" type="number" min="0" step="any" value="1">
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <label class="checkbox-inline">
+            <input id="single-roundtrip" type="checkbox">
+            去回程（×2）
+          </label>
+          <button id="btn-single-calc" class="btn btn-primary" type="button">抓取最短距離並試算</button>
+          <button id="btn-single-zip" class="btn btn-outline" type="button" disabled>一鍵匯出單筆 ZIP</button>
+        </div>
+      </div>
+
+      <div class="summary-card" id="single-summary-card">
+        <div class="card-header">
+          <h2>2. 試算結果摘要（Single Source of Truth）</h2>
+          <span class="sub-hint" id="single-formula-hint">公式：最短距離 × 活動數據 × 係數</span>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-metric">
+            <div class="label">最短距離（km）</div>
+            <div class="value" id="res-distance">—</div>
+          </div>
+          <div class="summary-metric">
+            <div class="label">GHG 總排放量（kgCO2e）</div>
+            <div class="value" id="res-ghg">—</div>
+          </div>
+          <div class="summary-metric">
+            <div class="label">採用係數與年份</div>
+            <div class="value" id="res-factor" style="font-size: 0.96rem;">—</div>
+          </div>
+          <div class="summary-metric">
+            <div class="label">採用路線說明</div>
+            <div class="value" id="res-route" style="font-size: 0.96rem;">—</div>
+            <div id="res-gmaps-link-wrap" style="margin-top: 6px; font-size: 0.78rem;"></div>
+          </div>
+        </div>
+        <div id="single-error-box" class="notice notice-danger" style="margin-top: 12px; display: none;"></div>
+      </div>
+
+      <div class="card" style="margin-top: 18px;">
+        <div class="card-header">
+          <h2>3. Google Maps 原生最短路徑截圖預覽</h2>
+          <span class="sub-hint">由本機 Playwright 引擎鎖定最短路線並即時截圖（不嵌入互動 iframe）</span>
+        </div>
+        <div id="single-screenshot-box" class="screenshot-box">
+          尚未執行查詢。啟動本機引擎（<code>127.0.0.1:8787</code>）後點擊「抓取最短距離並試算」，即可在此檢視原生截圖。
+        </div>
+      </div>
+    </section>
+
+    <!-- 頁籤 2：批次最短距離與截圖（≤20 筆） -->
+    <section id="tab-batch" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>批次匯入與 ZIP 匯出（單次上限 20 筆）</h2>
+          <span class="sub-hint">專注於純抓最短距離＋對應原生截圖，匯出 Excel 與 screenshots/ 壓縮檔</span>
+        </div>
+        <div class="notice notice-info">
+          標準範本固定欄位：<code>項次</code>、<code>起點地址</code>、<code>終點地址</code>、<code>車輛</code>（限填 <code>汽車</code> 或 <code>機車</code>）。單次上傳嚴格限制 1 至 20 筆。
+        </div>
+        <div class="actions-row" style="margin-top: 0;">
+          <button id="btn-download-template" class="btn btn-outline" type="button">下載標準 Excel 範本（.xlsx）</button>
+          <label class="btn btn-primary" for="batch-file-input" style="cursor: pointer;">
+            選擇 Excel 檔案（.xlsx）
+            <input id="batch-file-input" type="file" accept=".xlsx,.xls" hidden>
+          </label>
+          <button id="btn-batch-run" class="btn btn-primary" type="button" disabled>開始批次抓取</button>
+          <button id="btn-batch-zip" class="btn btn-outline" type="button" disabled>一鍵匯出批次 ZIP</button>
+        </div>
+        <div id="batch-status-msg" class="sub-hint" style="margin-top: 12px;">尚未上傳 Excel 檔案。</div>
+        <div id="batch-error-box" class="notice notice-danger" style="margin-top: 10px; display: none;"></div>
+        <div id="batch-progress-wrap" class="progress-wrap" style="display: none;">
+          <div class="progress-bar-bg">
+            <div id="batch-progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+          <div id="batch-progress-text" class="sub-hint" style="margin-top: 4px;">準備中...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>批次預覽與即時抓取結果</h2>
+          <span class="sub-hint">單筆失敗不中斷後續項次，完成後可一鍵匯出 ZIP（Excel + screenshots/）</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>項次</th>
+                <th>起點地址</th>
+                <th>終點地址</th>
+                <th>車輛</th>
+                <th>最短距離 (km)</th>
+                <th>採用路線</th>
+                <th>預估時間</th>
+                <th>候選數</th>
+                <th>截圖預覽</th>
+                <th>狀態</th>
+              </tr>
+            </thead>
+            <tbody id="batch-table-body">
+              <tr><td colspan="10">請先下載標準範本或上傳 Excel（.xlsx）檔案。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 頁籤 3：公路運輸係數庫 -->
+    <section id="tab-factors" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>環境部公路運輸碳足跡係數庫（9 大子類）</h2>
+          <span class="sub-hint" id="factors-meta-hint">資料來源：環境部 CFP_P_02</span>
+        </div>
+        <div id="factor-group-pills" class="pill-filter-row" role="group" aria-label="公路運輸子類別篩選"></div>
+        <div class="form-grid" style="margin-bottom: 14px;">
+          <div class="field">
+            <label for="factor-search">關鍵字搜尋係數名稱或單位</label>
+            <input id="factor-search" type="search" placeholder="輸入關鍵字，例如：柴油、冷藏、小客車、3.49噸...">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>子類別</th>
+                <th>係數名稱</th>
+                <th>碳排係數</th>
+                <th>宣告單位</th>
+                <th>公告年</th>
+                <th>導航預設</th>
+                <th>對應公式</th>
+              </tr>
+            </thead>
+            <tbody id="factors-table-body">
+              <tr><td colspan="7">係數載入中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 頁籤 4：本機引擎與 MRV 說明 -->
+    <section id="tab-mrv" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>雙軌零 API 費架構與 MRV 查證規範</h2>
+          <span class="sub-hint">100% 數據與截圖一致原則（Single Source of Truth）</span>
+        </div>
+        <div class="notice notice-info">
+          本系統採「Cloudflare Pages 靜態前端 ＋ 本機 Playwright 最短路徑截圖引擎（<code>http://127.0.0.1:8787</code>）」雙軌設計，無需支付 Google Maps Routes API 費用即可產出可稽核之原始證據截圖。
+        </div>
+        <h3 style="font-size: 0.98rem; margin: 16px 0 8px;">一、最短距離鎖定流程</h3>
+        <ol style="margin: 0 0 14px; padding-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
+          <li>本機 Chromium（固定視窗 <code>1366×820</code>、<code>zh-TW</code>）開啟 Google Maps 路線頁並切換至指定車輛模式（<code>汽車</code> 或 <code>機車</code>）。</li>
+          <li>不勾選避開高速公路，讀取左側所有預設替代路線卡片，以正規表示式解析公里數並選出最小值。</li>
+          <li>程式點擊該最短路線並等待地圖深藍主路線重繪完成，再從「已選取」路線 DOM 讀回最終公里數並於同一畫面狀態截圖。</li>
+        </ol>
+        <h3 style="font-size: 0.98rem; margin: 16px 0 8px;">二、環境部宣告單位計算公式</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
+          <li><strong>延噸公里 (tkm)</strong>：<code>排放量 = 最短距離 (km) × 載重 (公噸) × 係數 × (去回程 ? 2 : 1)</code></li>
+          <li><strong>延人公里 (pkm)</strong>：<code>排放量 = 最短距離 (km) × 人數 × 係數 × (去回程 ? 2 : 1)</code></li>
+          <li><strong>公里 (km)</strong>：<code>排放量 = 最短距離 (km) × 趟次 × 係數 × (去回程 ? 2 : 1)</code></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      臺灣陸地運輸GHG排放計算器（<code>tw-road-carbon</code>）｜晧脈元素庫 <code>Cr · 24</code>｜環境部 <code>CFP_P_02</code> 公路運輸係數 × Playwright MRV 查證引擎
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
