@@ -134,7 +134,7 @@
       <button class="tab-btn active" role="tab" aria-selected="true" data-tab="single">單筆陸運試算</button>
       <button class="tab-btn" role="tab" aria-selected="false" data-tab="batch">批次最短距離與截圖（≤20 筆）</button>
       <button class="tab-btn" role="tab" aria-selected="false" data-tab="factors">公路運輸係數庫</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-tab="mrv">本機引擎與 MRV 說明</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="mrv">操作手冊與 MRV 說明</button>
     </div>
   </nav>
 
@@ -321,24 +321,89 @@
       </div>
     </section>
 
-    <!-- 頁籤 4：本機引擎與 MRV 說明 -->
+    <!-- 頁籤 4：操作手冊與 MRV 說明 -->
     <section id="tab-mrv" class="tab-panel" role="tabpanel">
       <div class="card">
         <div class="card-header">
-          <h2>雙軌零 API 費架構與 MRV 查證規範</h2>
-          <span class="sub-hint">100% 數據與截圖一致原則（Single Source of Truth）</span>
+          <h2>新手 3 分鐘操作手冊（免 Google API 費用）</h2>
+          <span class="sub-hint">所有資料與截圖皆在您的電腦本機處理，安全不外洩</span>
         </div>
         <div class="notice notice-info">
-          本系統採「Cloudflare Pages 靜態前端 ＋ 本機 Playwright 最短路徑截圖引擎（<code>http://127.0.0.1:8787</code>）」雙軌設計，無需支付 Google Maps Routes API 費用即可產出可稽核之原始證據截圖。
+          <strong>為什麼需要一個「本機小幫手」？</strong><br>
+          本網站的係數查詢與公式完全免費、打開就能看；只有「<strong>自動打開 Google 地圖比對最短路線並拍照截圖</strong>」這件事，因為瀏覽器禁止網頁直接遙控 Google 地圖，所以改由您電腦上的小幫手代勞，幫您省下昂貴的 Google API 費用，產出的截圖也完全符合稽核查證要求。
         </div>
-        <h3 style="font-size: 0.98rem; margin: 16px 0 8px;">一、最短距離鎖定流程</h3>
-        <ol style="margin: 0 0 14px; padding-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
+
+        <div class="guide-grid">
+          <div class="guide-step-card">
+            <span class="step-badge">第 1 步（只需做一次）</span>
+            <h3>下載並啟動小幫手</h3>
+            <p>
+              1. 確認電腦已安裝 <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">Python 3.10 以上</a>（安裝時請勾選 <code>Add Python to PATH</code>）。<br>
+              2. <a href="https://github.com/whaochen/tw-road-carbon/archive/refs/heads/main.zip" target="_blank" rel="noopener"><strong>點此下載完整工具包（ZIP）↗</strong></a> 並解壓縮。<br>
+              3. 進入 <code>engine</code> 資料夾，雙擊 <code>一鍵啟動本機引擎.bat</code>。
+            </p>
+          </div>
+
+          <div class="guide-step-card">
+            <span class="step-badge">第 2 步（看到黑視窗別慌）</span>
+            <h3>縮小視窗、確認綠燈</h3>
+            <p>
+              首次啟動會自動安裝元件（約 1～2 分鐘）。看到畫面出現「<strong>本機截圖小幫手已就緒</strong>」後，<strong>把黑色視窗縮小放著（不要按 ✕ 關閉）</strong>。<br>
+              回到網頁，上方「本機引擎狀態」變成綠燈 <strong>● 已連線</strong> 即可開始使用！
+            </p>
+          </div>
+
+          <div class="guide-step-card">
+            <span class="step-badge">第 3 步（日常使用）</span>
+            <h3>單筆試算或 20 筆批次匯出</h3>
+            <p>
+              • <strong>單筆</strong>：填起訖點、選係數與載重／人數 → 按「抓取最短距離並試算」→ 下載單筆 ZIP。<br>
+              • <strong>批次（≤20 筆）</strong>：下載標準 Excel 範本填寫 → 上傳執行 → 一鍵匯出包含 Excel 與 <code>screenshots/</code> 的完整 ZIP。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>懶人離線法 &amp; 常見問題 Q&amp;A</h2>
+          <span class="sub-hint">遇到紅燈或不想開網頁時看這裡</span>
+        </div>
+        <div class="qa-list">
+          <div class="qa-item">
+            <div class="qa-q">Q1：可以不開網頁，直接跑 20 筆 Excel 批次截圖嗎？</div>
+            <div class="qa-a">
+              <strong>可以！</strong>把填好的 <code>.xlsx</code> 檔案直接用滑鼠<strong>拖曳到 <code>engine\一鍵啟動本機引擎.bat</code> 圖示上放開</strong>，小幫手就會自動逐筆抓取最短距離與截圖，完成後在同一個資料夾產出完整 ZIP 壓縮檔。
+            </div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q">Q2：小幫手已經開著，但線上網頁還是顯示「待機中」或「權限遭封鎖」？</div>
+            <div class="qa-a">
+              新版瀏覽器為了安全，第一次連線本機時會詢問「是否允許存取本地網路」。若不小心按到封鎖，請點擊網址列最左側的設定圖示 → 點「<strong>重設權限</strong>」→ 按 <code>F5</code> 重新整理；或直接改用本機網址 <a href="http://127.0.0.1:8787/" target="_blank" rel="noopener"><code>http://127.0.0.1:8787/</code> ↗</a>（免任何權限設定，功能完全一樣）。
+            </div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q">Q3：跳出黑色視窗會不會對電腦有危險？</div>
+            <div class="qa-a">
+              不會。該視窗只是在本機（<code>127.0.0.1</code>）執行一個開源的路線截圖程式，所有地址與 Excel 資料都只留在您自己的電腦裡，不會上傳到任何第三方伺服器；使用完畢直接關閉黑色視窗即可完全停止。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>MRV 查證原理與環境部計算公式</h2>
+          <span class="sub-hint">100% 數據與截圖一致原則（Single Source of Truth）</span>
+        </div>
+        <h3 style="font-size: 0.96rem; margin: 0 0 8px;">一、最短距離鎖定流程</h3>
+        <ol style="margin: 0 0 14px; padding-left: 20px; font-size: 0.88rem; color: var(--text-muted);">
           <li>本機 Chromium（固定視窗 <code>1366×820</code>、<code>zh-TW</code>）開啟 Google Maps 路線頁並切換至指定車輛模式（<code>汽車</code> 或 <code>機車</code>）。</li>
           <li>不勾選避開高速公路，讀取左側所有預設替代路線卡片，以正規表示式解析公里數並選出最小值。</li>
           <li>程式點擊該最短路線並等待地圖深藍主路線重繪完成，再從「已選取」路線 DOM 讀回最終公里數並於同一畫面狀態截圖。</li>
         </ol>
-        <h3 style="font-size: 0.98rem; margin: 16px 0 8px;">二、環境部宣告單位計算公式</h3>
-        <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
+        <h3 style="font-size: 0.96rem; margin: 0 0 8px;">二、環境部宣告單位計算公式</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 0.88rem; color: var(--text-muted);">
           <li><strong>延噸公里 (tkm)</strong>：<code>排放量 = 最短距離 (km) × 載重 (公噸) × 係數 × (去回程 ? 2 : 1)</code></li>
           <li><strong>延人公里 (pkm)</strong>：<code>排放量 = 最短距離 (km) × 人數 × 係數 × (去回程 ? 2 : 1)</code></li>
           <li><strong>公里 (km)</strong>：<code>排放量 = 最短距離 (km) × 趟次 × 係數 × (去回程 ? 2 : 1)</code></li>
