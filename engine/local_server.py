@@ -33,6 +33,13 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def add_private_network_access_header(request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Private-Network"] = "true"
+    return response
+
+
 class RouteRequest(BaseModel):
     origin: str = Field(..., min_length=1, description="起點地址")
     destination: str = Field(..., min_length=1, description="終點地址")
