@@ -357,25 +357,24 @@
   <div id="engine-help-modal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="engine-modal-title">
     <div class="modal-card">
       <div class="modal-header">
-        <h2 id="engine-modal-title">本機引擎連線與瀏覽器權限引導</h2>
+        <h2 id="engine-modal-title">如何啟用「自動抓距離與截圖」小幫手？</h2>
         <button type="button" id="btn-close-engine-modal" class="modal-close" aria-label="關閉">✕</button>
       </div>
       <div class="modal-body">
         <p id="engine-modal-desc" style="margin-top: 0; font-size: 0.9rem; color: var(--text-muted);">
-          若您已啟動本機引擎（<code>127.0.0.1:8787</code>），但網頁仍顯示「未啟動」或「權限遭封鎖」，請依下列方式排除：
+          別擔心！這只是代表您電腦上的<strong>「本機截圖小幫手」尚未開啟</strong>。為了幫您省下 Google Maps API 費用並產出可稽核的原始截圖，自動抓距離功能需要透過本機小幫手執行：
         </p>
-        <div class="notice notice-warn">
-          <strong>方法 1：重新允許瀏覽器「本地網路存取」權限（推薦）</strong>
+        <div class="notice notice-info">
+          <strong>只需 2 個步驟即可連線：</strong>
           <ol style="margin: 6px 0 0; padding-left: 18px;">
-            <li>點擊瀏覽器網址列最左側的 <strong>設定圖示（鎖頭或調整符號）</strong>。</li>
-            <li>找到「<strong>本地網路存取（Local network access）</strong>」或「不安全的內容」。</li>
-            <li>將權限切換為「<strong>允許</strong>」，再點擊下方「立即重新偵測」。</li>
+            <li>在電腦專案資料夾中，雙擊執行 <code>engine\一鍵啟動本機引擎.bat</code>（出現視窗顯示 <code>127.0.0.1:8787</code> 後可將其縮小，不要關閉）。</li>
+            <li>回到本網頁點擊下方「<strong>立即重新偵測</strong>」（若瀏覽器詢問「是否允許存取本地網路」，請點選「<strong>允許</strong>」）。</li>
           </ol>
         </div>
-        <div class="notice notice-info" style="margin-bottom: 0;">
-          <strong>方法 2：免設定直接開啟本機版（零權限限制）</strong>
+        <div class="notice notice-warn" style="margin-bottom: 0;">
+          <strong>若小幫手已開啟卻仍無法連線：</strong>
           <p style="margin: 6px 0 0;">
-            本機引擎已內建完整網頁前端，若不想調整權限，可直接從本機網址開啟使用，功能與線上版完全相同。
+            可點擊網址列左側的設定圖示 → 點選「<strong>重設權限</strong>」（或將本地網路存取設為「允許」）後按 <code>F5</code> 重新整理，或直接點擊下方按鈕開啟本機版。
           </p>
         </div>
       </div>

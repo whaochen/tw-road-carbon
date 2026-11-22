@@ -8,7 +8,6 @@ if exist ".venv\Scripts\python.exe" (
     set "PY=python"
 )
 
-%PY% -c "import sys; print('[tw-road-carbon] Local Engine Launcher'); sys.exit(0)"
 %PY% -c "import fastapi, uvicorn, openpyxl, playwright" 2>nul
 if errorlevel 1 (
     echo [Setup] Installing Python dependencies and Chromium...
@@ -28,11 +27,6 @@ if not "%~1"=="" (
     exit /b 0
 )
 
-echo.
-echo [Ready] Local server starting at http://127.0.0.1:8787
-echo Keep this window open while using the web calculator.
-echo Press Ctrl+C to stop.
-echo.
 %PY% -m uvicorn engine.local_server:app --host 127.0.0.1 --port 8787
 popd
 pause

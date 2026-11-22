@@ -65,9 +65,9 @@ async function checkLocalEngineHealth() {
         hintEl.classList.remove("hidden");
       }
     } else {
-      textEl.textContent = "未啟動";
+      textEl.textContent = "待機中";
       if (hintEl) {
-        hintEl.textContent = "↻ 點擊重連";
+        hintEl.textContent = "↻ 點擊啟動說明";
         hintEl.classList.remove("hidden");
       }
     }

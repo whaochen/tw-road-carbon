@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import base64
+import sys
 import tempfile
+from contextlib import asynccontextmanager
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Literal
@@ -18,9 +20,31 @@ from engine.gmaps_shortest import (
     make_screenshot_filename,
 )
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        print(
+            "\n==================================================\n"
+            "  臺灣陸地運輸GHG排放計算器 - 本機截圖小幫手已就緒\n"
+            "  請將此視窗最小化（不要關閉），即可回到網頁使用：\n"
+            "  - 線上版：https://tw-road-carbon.pages.dev/\n"
+            "  - 本機版：http://127.0.0.1:8787/\n"
+            "  若要結束，直接關閉視窗或按 Ctrl+C。\n"
+            "==================================================\n",
+            flush=True,
+        )
+    except Exception:
+        pass
+    yield
+
+
 app = FastAPI(
     title="tw-road-carbon 本機最短路徑截圖引擎",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
