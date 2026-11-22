@@ -134,7 +134,7 @@
       <button class="tab-btn active" role="tab" aria-selected="true" data-tab="single">單筆陸運試算</button>
       <button class="tab-btn" role="tab" aria-selected="false" data-tab="batch">批次最短距離與截圖（≤20 筆）</button>
       <button class="tab-btn" role="tab" aria-selected="false" data-tab="factors">公路運輸係數庫</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-tab="mrv">操作手冊與 MRV 說明</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="mrv">操作手冊與 MRV 說明 <span class="tab-badge-highlight">新手必讀</span></button>
     </div>
   </nav>
 
@@ -383,9 +383,12 @@
             </div>
           </div>
           <div class="qa-item">
-            <div class="qa-q">Q3：跳出黑色視窗會不會對電腦有危險？</div>
+            <div class="qa-q">Q3：下載工具包與跳出黑色視窗，會不會被誤認是木馬程式或病毒？安全嗎？</div>
             <div class="qa-a">
-              不會。該視窗只是在本機（<code>127.0.0.1</code>）執行一個開源的路線截圖程式，所有地址與 Excel 資料都只留在您自己的電腦裡，不會上傳到任何第三方伺服器；使用完畢直接關閉黑色視窗即可完全停止。
+              <strong>完全安全，絕非木馬或惡意程式。</strong>
+              工具包內<strong>沒有任何加密或封裝的 <code>.exe</code> 執行檔</strong>，全部是公開透明的純文字原始碼（<code>.py</code> 與 <code>.bat</code>），您可隨時用記事本打開檢查，或前往
+              <a href="https://github.com/whaochen/tw-road-carbon/tree/main/engine" target="_blank" rel="noopener">GitHub 檢視原始碼 ↗</a>。
+              所有地址與 Excel 資料皆只留在您本機（<code>127.0.0.1</code>），不會上傳至任何第三方伺服器。若 Windows 對剛下載的 <code>.bat</code> 出現保護提醒，屬未數位簽章腳本之正常提示，確認來源後放行即可；使用完畢直接關閉視窗即完全停止。
             </div>
           </div>
         </div>
@@ -427,8 +430,14 @@
       </div>
       <div class="modal-body">
         <p id="engine-modal-desc" style="margin-top: 0; font-size: 0.9rem; color: var(--text-muted);">
-          別擔心！這只是代表您電腦上的<strong>「本機截圖小幫手」尚未開啟</strong>。為了幫您省下 Google Maps API 費用並產出可稽核的原始截圖，自動抓距離功能需要透過本機小幫手執行：
+          別擔心！這只是代表您電腦上的<strong>「本機截圖小幫手」尚未開啟</strong>。為了幫您省下 Google Maps API 費用並產出可稽核的原始截圖，自動抓距離功能需要透過本機小幫手執行。建議您<strong>先閱讀「操作手冊」</strong>再決定是否啟用：
         </p>
+        <div class="notice notice-info">
+          <strong>安全與開源保證（非木馬／非加密執行檔）：</strong>
+          <p style="margin: 6px 0 0;">
+            工具包內<strong>不含任何未知 <code>.exe</code> 執行檔</strong>，全數為純文字開源腳本（<a href="https://github.com/whaochen/tw-road-carbon/tree/main/engine" target="_blank" rel="noopener">點此公開檢視 GitHub 原始碼 ↗</a>），可用記事本直接開啟檢查；所有地址與 Excel 皆僅在您本機處理，絕不上傳第三方。
+          </p>
+        </div>
         <div class="notice notice-info">
           <strong>只需 3 個步驟即可連線：</strong>
           <ol style="margin: 6px 0 0; padding-left: 18px;">
@@ -449,6 +458,7 @@
         </div>
       </div>
       <div class="modal-footer">
+        <button type="button" id="btn-modal-guide" class="btn btn-outline">先看操作手冊</button>
         <button type="button" id="btn-modal-retry" class="btn btn-primary">立即重新偵測</button>
         <a href="http://127.0.0.1:8787/" target="_blank" rel="noopener" class="btn btn-outline">直接開啟本機版 (127.0.0.1:8787) ↗</a>
       </div>

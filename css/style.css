@@ -322,6 +322,19 @@ body {
   border-bottom-color: var(--primary);
 }
 
+.tab-badge-highlight {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
+  vertical-align: middle;
+}
+
 /* =========================================================
    主體容器與卡片
    ========================================================= */

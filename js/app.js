@@ -4,21 +4,25 @@ import { initBatchTab } from "./batch.js";
 
 const LOCAL_ENGINE_BASE = "http://127.0.0.1:8787";
 
-function initTabs() {
+function activateTab(target) {
   const buttons = document.querySelectorAll(".tab-btn");
   const panels = document.querySelectorAll(".tab-panel");
 
+  buttons.forEach((b) => {
+    const isActive = b.dataset.tab === target;
+    b.classList.toggle("active", isActive);
+    b.setAttribute("aria-selected", String(isActive));
+  });
+  panels.forEach((p) => {
+    p.classList.toggle("active", p.id === `tab-${target}`);
+  });
+}
+
+function initTabs() {
+  const buttons = document.querySelectorAll(".tab-btn");
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const target = btn.dataset.tab;
-      buttons.forEach((b) => {
-        const isActive = b === btn;
-        b.classList.toggle("active", isActive);
-        b.setAttribute("aria-selected", String(isActive));
-      });
-      panels.forEach((p) => {
-        p.classList.toggle("active", p.id === `tab-${target}`);
-      });
+      activateTab(btn.dataset.tab);
     });
   });
 }
@@ -81,6 +85,7 @@ function initEngineStatusModal() {
   const statusBtn = document.getElementById("btn-engine-status");
   const modal = document.getElementById("engine-help-modal");
   const closeBtn = document.getElementById("btn-close-engine-modal");
+  const guideBtn = document.getElementById("btn-modal-guide");
   const retryBtn = document.getElementById("btn-modal-retry");
   const textEl = document.getElementById("kpi-engine-text");
 
@@ -111,6 +116,12 @@ function initEngineStatusModal() {
     if (ok) {
       closeModal();
     }
+  });
+
+  guideBtn?.addEventListener("click", () => {
+    closeModal();
+    activateTab("mrv");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   closeBtn?.addEventListener("click", closeModal);
